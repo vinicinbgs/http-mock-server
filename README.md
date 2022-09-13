@@ -29,3 +29,16 @@ fn function_name() {
 
 }
 ```
+
+#### Variables:
+Variables are **immutable** by default but to change it you can use keyword **mut**
+```rs
+let mut v = "hi";
+```
+
+##### Ownership
+Set of rules that manages memory rust program.
+
+- Each value in Rust has an owner.
+- There can only be one owner at a time.
+- When the owner goes out of scope, the value will be dropped.
