@@ -1,7 +1,14 @@
+# To Start Project
+```sh
+docker-compose up -d --build
+sh request.sh
+```
+
 # Rust
 Learning the basics of Rust Lang <br />
 
 ⚙️ **Package Manager:** Cargo <br />
+Packages are called as **crates**
 
 ❗ **Rust is a compiled language that use statically typed variables**
 

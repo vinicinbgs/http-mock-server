@@ -1,21 +1,13 @@
-use std::io;
-
-mod account;
+mod server;
 
 fn main() {
-    println!("Please, enter your name");
-    let mut name = String::new();
+    let listener = server::start();
+   
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
 
-    io::stdin()
-        .read_line(&mut name)
-        .expect("Hmmm... Sorry I did't");
+        let res = server::request(&stream);
 
-    println!("Please, enter your value");
-    let mut value = String::new();
-    
-    io::stdin()
-        .read_line(&mut value)
-        .expect("Hmmm... Sorry I did't");
-
-    account::get_balance(&name, &value);
+        server::response(stream, res);
+    }
 }
