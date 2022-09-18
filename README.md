@@ -42,3 +42,6 @@ Set of rules that manages memory rust program.
 - Each value in Rust has an owner.
 - There can only be one owner at a time.
 - When the owner goes out of scope, the value will be dropped.
+
+##### Tips:
+- **prelude**: The prelude is the list of things that Rust automatically imports into every Rust program.

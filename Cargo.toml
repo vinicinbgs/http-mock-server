@@ -7,3 +7,7 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4.22"
+mysql = "22.2.0"
+
+[dev-dependencies]
+rustfmt = "0.10.0"

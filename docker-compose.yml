@@ -1,7 +1,24 @@
 version: "3.3"
 
 services:
-  rust:
-    build: .
+  # rust:
+  #   build: .
+  #   restart: always
+  #   ports:
+  #     - "7878:7878"
+  #   networks:
+  #    - rust_network
+
+  mysql:
+    image: arm64v8/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
     ports:
-      - "7878:7878"
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+     - rust_network
+
+networks:
+  rust_network:
