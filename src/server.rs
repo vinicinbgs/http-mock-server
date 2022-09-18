@@ -1,10 +1,12 @@
 use std::{
     io::{Read, Write},
     net::{TcpListener, TcpStream},
-    str,
-    {thread, time},
-    time::Instant
+    str
 };
+
+#[path = "./log.rs"]
+mod log;
+use log::Log;
 
 pub fn start() -> TcpListener {
     let dns: &str = "0.0.0.0";
@@ -18,34 +20,31 @@ pub fn request(mut stream: &TcpStream) -> String {
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
     let data = str::from_utf8(&buffer).unwrap();
+    
+    let ip = stream.local_addr().unwrap();
 
     let request_vec: Vec<_> = data.split("\r\n").collect();
-    let mut i: i32 = 0;
-    let mut data = "";
-
-    let start = Instant::now();
+    let mut skip_line: i32 = 0;
+    let mut body = "";
 
     for line in &request_vec {
         if line.is_empty() {
-            i += 1;
+            skip_line += 1;
             continue;
         }
 
-        if i == 1 {
-            data = line;
+        if skip_line == 1 {
+            body = line.trim_end_matches("\0");
         }
     }
-    
-    let ten_millis = time::Duration::from_millis(1000);
-    thread::sleep(ten_millis);
 
-    let elapsed = start.elapsed();
+    let log = Log {
+        ip: ip.to_string(),
+    };
 
-    println!("{}", elapsed.as_millis());
+    log.emit(body);
 
-    println!("OK");
-
-    return data.trim_end_matches("\0").to_string();
+    return body.to_string();
 }
 
 pub fn response(mut stream: TcpStream, data: String) {
