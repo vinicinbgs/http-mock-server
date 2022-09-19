@@ -8,7 +8,7 @@ struct Request {
 }
 
 fn connect() -> Result<mysql::PooledConn> {
-    let url = "mysql://root:root@localhost:3306/db_name";
+    let url = "mysql://root:root@mysql:3306/db_name";
 
     let pool = Pool::new(url)?;
 

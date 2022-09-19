@@ -1,13 +1,13 @@
 version: "3.3"
 
 services:
-  # rust:
-  #   build: .
-  #   restart: always
-  #   ports:
-  #     - "7878:7878"
-  #   networks:
-  #    - rust_network
+  rust:
+    build: .
+    restart: always
+    ports:
+      - "7878:7878"
+    networks:
+     - rust_network
 
   mysql:
     image: arm64v8/mysql
