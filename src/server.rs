@@ -10,7 +10,7 @@ use http_log::HttpLog;
 
 pub struct HttpFields {
     pub body: String,
-    pub url: String,
+    pub original_url: String,
     pub method: String,
 }
 
@@ -61,7 +61,7 @@ pub fn request(mut stream: &TcpStream) -> HttpFields {
 
     return HttpFields {
         body: body.to_string(),
-        url: url(http_method_path),
+        original_url: url(http_method_path),
         method: method(http_method_path),
     };
 }

@@ -1,8 +1,6 @@
 use chrono::{DateTime, Utc};
+use serde_json;
 use std::io::{self, Write};
-
-#[path = "./utils/util_strings.rs"]
-mod util_strings;
 
 pub struct HttpLog {
     pub ip: String,
@@ -15,9 +13,8 @@ impl HttpLog {
         let mut handle = stderr.lock();
 
         let now: DateTime<Utc> = Utc::now();
-        let mut context = data.to_string().replace("\n", "");
 
-        util_strings::remove_whitespace(&mut context);
+        let context = serde_json::to_string(data).unwrap();
 
         write!(
             handle,

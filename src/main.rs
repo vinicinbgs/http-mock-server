@@ -1,7 +1,7 @@
 mod server;
 
-#[path = "./controllers/home_controller.rs"]
-mod home_controller;
+#[path = "./controllers/mock_controller.rs"]
+mod mock_controller;
 
 fn main() {
     let listener = server::start();
@@ -12,10 +12,9 @@ fn main() {
         let http_fields = server::request(&stream);
 
         match http_fields.method.as_str() {
-            "GET" => {
-                home_controller::index(stream, http_fields.body);
-            }
-            _ => print!("HEY"),
+            "POST" => mock_controller::store(stream, http_fields),
+            "GET" => mock_controller::index(stream, http_fields),
+            _ => println!("_"),
         }
     }
 }

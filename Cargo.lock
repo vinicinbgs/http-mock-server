@@ -1265,6 +1265,8 @@ dependencies = [
  "chrono",
  "mysql",
  "rustfmt",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
