@@ -28,7 +28,7 @@ sequenceDiagram
     Request->>+Controller: request
     Controller->>+Database: record
     Database->>-Controller: record
-    Controller->>-Request: record
+    Controller->>-Request: response
 ```
 
 # To Start Project
