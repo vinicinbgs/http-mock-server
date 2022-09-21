@@ -21,8 +21,16 @@ Return:
 ```sh
 {"message":"hello world"}
 ```
-**Architecture of Request:** <br />
-Request ---> Controller ---> Database (MySQL)
+
+# Architecture of Request:
+```mermaid
+sequenceDiagram
+    Request->>+Controller: request
+    Controller->>+Database: record
+    Database->>-Controller: record
+    Controller->>-Request: record
+```
+
 # To Start Project
 ```sh
 docker-compose up -d --build
