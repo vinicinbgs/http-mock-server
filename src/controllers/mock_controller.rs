@@ -21,6 +21,7 @@ pub fn store(mut stream: TcpStream, http_fields: HttpFields) {
 }
 
 pub fn index(mut stream: TcpStream, http_fields: HttpFields) {
+    let _ = db::create_table();
     let body = db::get_mock_path(&http_fields.original_url);
 
     let content = format!("{}", body.unwrap());
