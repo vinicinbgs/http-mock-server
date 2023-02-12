@@ -1,4 +1,8 @@
+extern crate routes;
+
 use std::{io::Write, net::TcpStream};
+
+use routes::route;
 
 use crate::server::HttpFields;
 
@@ -8,6 +12,7 @@ mod db;
 const STATUS: &str = "HTTP/1.1 200 OK";
 const CONTENT_TYPE: &str = "Content-Type: application/json";
 
+#[route(POST, "/abc")]
 pub fn store(mut stream: TcpStream, http_fields: HttpFields) {
     let _ = db::create_table();
     let _ = db::insert(&http_fields.original_url, &http_fields.body);
@@ -20,13 +25,14 @@ pub fn store(mut stream: TcpStream, http_fields: HttpFields) {
         .unwrap();
 }
 
+#[route(GET, "/abc")]
 pub fn index(mut stream: TcpStream, http_fields: HttpFields) {
     let _ = db::create_table();
     let body = db::get_mock_path(&http_fields.original_url);
 
     let content = format!("{}", body.unwrap());
     let length = format!("Content-Length: {}", content.len());
-
+    
     stream
         .write_all(response_format(length, content).as_bytes())
         .unwrap();

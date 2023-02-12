@@ -3,7 +3,6 @@ use serde_json;
 use std::io::{self, StderrLock, Write};
 
 mod config;
-
 pub struct HttpLog {
     pub ip: String,
     pub http_method_path: String,
