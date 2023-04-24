@@ -15,6 +15,16 @@
           "zip": "12345"
         }
       }
+    },
+    "GET": {
+      "$.request": {
+        "explode": "mlq",
+        "mlq": 10
+      },
+      "person": {
+        "name": "John Doea",
+        "age": 30
+      }
     }
   }
 }
