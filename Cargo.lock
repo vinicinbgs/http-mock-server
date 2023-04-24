@@ -1248,14 +1248,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "routes"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn",
-]
-
-[[package]]
 name = "rust_decimal"
 version = "1.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1272,7 +1264,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "mysql",
- "routes",
+ "regex 1.6.0",
  "rustfmt",
  "serde",
  "serde_json",
