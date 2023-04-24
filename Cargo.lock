@@ -1264,6 +1264,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "mysql",
+ "regex 1.6.0",
  "rustfmt",
  "serde",
  "serde_json",

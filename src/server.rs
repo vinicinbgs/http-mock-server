@@ -14,10 +14,11 @@ pub struct HttpFields {
     pub method: String,
 }
 
+pub const PORT: &str = ":7878";
+
 pub fn start() -> TcpListener {
     let dns: &str = "0.0.0.0";
-    let port: &str = ":7878";
-    let tcp: String = dns.to_owned() + &port.to_owned();
+    let tcp: String = dns.to_owned() + &PORT.to_owned();
 
     return TcpListener::bind(tcp).unwrap();
 }
