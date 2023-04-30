@@ -1,10 +1,6 @@
 {
   "/register/10": {
     "POST": {
-      "$.request": {
-        "explode": "mlq",
-        "mlq": 10
-      },
       "person": {
         "name": "John Doea",
         "age": 30,

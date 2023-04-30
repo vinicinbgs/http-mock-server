@@ -71,6 +71,6 @@ sh request.sh
 - [x] Stdout logs
 - [ ] Set HTTP Status Code
 - [ ] Multiples request body with different response in the same endpoint
-- [ ] Pass mock file by argument `./http_mock_server -f mock_data.json`
+- [x] Pass mock file by argument `./http_mock_server -- mock_data.json`
 - [ ] Save logs on Database
 - [ ] Save mocks on Database

@@ -1,7 +1,7 @@
-use std::{io::Write, net::TcpStream};
-use serde_json::Value::{Null, self};
-use regex::Regex;
 use crate::server::HttpFields;
+use regex::Regex;
+use serde_json::Value::{self, Null};
+use std::{io::Write, net::TcpStream};
 
 #[path = "../services/mock.rs"]
 mod mock_service;
@@ -14,7 +14,7 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     //let mut data: serde_json::Value = serde_json::from_str(&file_string).expect("Unable to parse");
     let http_path = http_fields.original_url.as_str();
     let http_method = http_fields.method.as_str();
-    
+
     // todo: Improve using dynamic route params
     //let first_path = path.split("/").collect::<Vec<&str>>()[1];
     // let re = Regex::new(format!("/{first_path}/([A-Z|a-z|0-9]*)").as_str()).unwrap();
@@ -25,7 +25,7 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     let re = Regex::new(r"\n\s*|\s").unwrap();
     let http_request_body = re.replace_all(&http_fields.body, "").to_string();
     let ret = mock_service::execute(http_path, http_method, http_request_body);
-    
+
     if ret["path"] != Null {
         status = "HTTP/1.1 404 NOT FOUND";
     }
@@ -56,9 +56,8 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
 
     // // Remove $.request Body from JSON
     // let _ = &data[http_path][http_method].as_object_mut().unwrap().remove("$.request");
-    
-    return response(&stream, ret, status)
 
+    return response(&stream, ret, status);
 }
 
 fn response_format(status: String, length: String, content: String) -> String {
