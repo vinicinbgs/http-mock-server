@@ -554,6 +554,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "http_mock_server"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "mysql",
+ "regex 1.6.0",
+ "rustfmt",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "iana-time-zone"
 version = "0.1.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1256,18 +1268,6 @@ dependencies = [
  "arrayvec",
  "num-traits",
  "serde",
-]
-
-[[package]]
-name = "rust_project"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "mysql",
- "regex 1.6.0",
- "rustfmt",
- "serde",
- "serde_json",
 ]
 
 [[package]]
