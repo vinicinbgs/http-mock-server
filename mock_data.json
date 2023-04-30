@@ -1,25 +1,13 @@
 {
-  "/register/10": {
+  "/register": {
     "POST": {
-      "person": {
-        "name": "John Doea",
-        "age": 30,
-        "address": {
-          "street": "123 Main St",
-          "city": "Anytown",
-          "state": "CA",
-          "zip": "12345"
-        }
-      }
-    },
-    "GET": {
-      "$.request": {
-        "explode": "mlq",
-        "mlq": 10
-      },
-      "person": {
-        "name": "John Doea",
-        "age": 30
+      "name": "John Doe",
+      "age": 30,
+      "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zip": "12345"
       }
     }
   }

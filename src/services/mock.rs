@@ -41,3 +41,19 @@ pub fn execute(http_path: &str, http_method: &str, http_request_body: String) ->
 
     return data[http_path][http_method].to_owned();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn it_works() {
+        let http_path = "/register";
+        let http_method = "POST";
+
+        let ret = execute(http_path, http_method, "".to_string());
+
+        assert_eq!(ret["name"], "John Doe");
+    }
+}
