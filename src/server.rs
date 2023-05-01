@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::{
     io::Read,
     net::{TcpListener, TcpStream},
@@ -8,17 +9,23 @@ use std::{
 mod http_log;
 use http_log::HttpLog;
 
+#[path = "./config.rs"]
+mod config;
+
 pub struct HttpFields {
     pub body: String,
     pub original_url: String,
     pub method: String,
 }
 
-pub const PORT: &str = ":7878";
+pub fn port() -> String {
+    let port = config::get("PORT");
+    return if port != "" { port } else { "7878".to_string() };
+}
 
 pub fn start() -> TcpListener {
     let dns: &str = "0.0.0.0";
-    let tcp: String = dns.to_owned() + &PORT.to_owned();
+    let tcp: String = dns.to_owned() + ":" + &port();
 
     return TcpListener::bind(tcp).unwrap();
 }
@@ -27,8 +34,6 @@ pub fn request(mut stream: &TcpStream) -> HttpFields {
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
     let data = str::from_utf8(&buffer).unwrap();
-
-    let ip = stream.local_addr().unwrap();
 
     let request_vec: Vec<_> = data.split("\r\n").collect();
     let mut skip_line: bool = false;
@@ -53,15 +58,18 @@ pub fn request(mut stream: &TcpStream) -> HttpFields {
         }
     }
 
+    let re = Regex::new(r"\n\s*|\s").unwrap(); // remove all spaces and new lines
+    let http_request_body = re.replace_all(&body, "").to_string();
+
     let access_log = HttpLog {
-        ip: ip.to_string(),
+        ip: stream.peer_addr().unwrap().to_string(),
         http_method_path: http_method_path.to_string(),
     };
 
-    access_log.emit(body);
+    access_log.emit(&http_request_body);
 
     return HttpFields {
-        body: body.to_string(),
+        body: http_request_body,
         original_url: url(http_method_path),
         method: method(http_method_path),
     };

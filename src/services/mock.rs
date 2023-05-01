@@ -61,9 +61,11 @@ pub fn execute(http: Http, file: File) -> Value {
 
     if data[http.path][http.method] == Null {
         return json!({
-            "error": "URI Path or HTTP Method Not found",
-            "path": http.path,
-            "method": http.method,
+            "$.body": {
+                "error": "URI Path or HTTP Method Not found",
+                "path": http.path,
+                "method": http.method,
+            }
         });
     }
 
@@ -76,8 +78,10 @@ pub fn execute(http: Http, file: File) -> Value {
     ) {
         let request: Value = serde_json::from_str(&http.request_body).unwrap_or_default();
         return json!({
-            "error": "Request body does not match",
-            "request": request,
+            "$.body": {
+                "error": "Request body does not match",
+                "request": request,
+            }
         });
     }
 
@@ -86,7 +90,7 @@ pub fn execute(http: Http, file: File) -> Value {
         .unwrap()
         .remove("$.request");
 
-    return data[http.path][http.method].to_owned();
+    return data[http.path][http.method]["$.response"].to_owned();
 }
 
 fn check_http_request_body_is_different_from_data_request_body(
@@ -121,7 +125,7 @@ mod tests {
             },
         );
 
-        assert_eq!(ret["name"], "John Doe");
+        assert_eq!(ret["$.body"]["name"], "John Doe");
     }
 
     #[test]
@@ -137,7 +141,7 @@ mod tests {
             },
         );
 
-        assert_eq!(ret["error"], "URI Path or HTTP Method Not found");
+        assert_eq!(ret["$.body"]["error"], "URI Path or HTTP Method Not found");
     }
 
     #[test]
@@ -153,7 +157,7 @@ mod tests {
             },
         );
 
-        assert_eq!(ret["error"], "Request body does not match");
+        assert_eq!(ret["$.body"]["error"], "Request body does not match");
     }
 
     #[test]
@@ -169,7 +173,7 @@ mod tests {
             },
         );
 
-        assert_eq!(ret["name"], "John Doe");
+        assert_eq!(ret["$.body"]["name"], "John Doe");
     }
 
     #[test]
@@ -185,6 +189,6 @@ mod tests {
             },
         );
 
-        assert_eq!(ret["name"], "John Doe");
+        assert_eq!(ret["$.body"]["name"], "John Doe");
     }
 }
