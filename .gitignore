@@ -4,3 +4,4 @@
 package.lock
 yarn.lock
 node_modules
+default_*.profraw

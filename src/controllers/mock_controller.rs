@@ -5,13 +5,11 @@ use std::{io::Write, net::TcpStream};
 
 #[path = "../services/mock.rs"]
 mod mock_service;
+use mock_service::{File, Http};
 
 pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     let mut status: &str = "HTTP/1.1 200 OK";
 
-    // let file_string = fs::read_to_string("./mock_data.json")
-    //     .expect("Unable to read file");
-    //let mut data: serde_json::Value = serde_json::from_str(&file_string).expect("Unable to parse");
     let http_path = http_fields.original_url.as_str();
     let http_method = http_fields.method.as_str();
 
@@ -24,7 +22,16 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     // Remove \n and spaces from request body
     let re = Regex::new(r"\n\s*|\s").unwrap();
     let http_request_body = re.replace_all(&http_fields.body, "").to_string();
-    let ret = mock_service::execute(http_path, http_method, http_request_body);
+    let ret = mock_service::execute(
+        Http {
+            path: http_path,
+            method: http_method,
+            request_body: http_request_body,
+        },
+        File {
+            file_path: String::new(),
+        },
+    );
 
     if ret["path"] != Null {
         status = "HTTP/1.1 404 NOT FOUND";
@@ -33,29 +40,6 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     if ret["request"] != Null {
         status = "HTTP/1.1 400 BAD REQUEST";
     }
-
-    // let data_request_body = data[http_path][http_method]["$.request"].to_owned();
-
-    // // Check Path / Method in JSON and Return 404 NOT FOUND
-    // if data[http_path][http_method] == Null  {
-    //     status = "HTTP/1.1 404 NOT FOUND";
-    //     data = json!({
-    //         "error": "URI Path or HTTP Method Not found"
-    //     });
-    //     return response(&stream, data, status);
-    // }
-
-    // // Check Request Body in JSON and Return 400 BAD REQUEST
-    // if data_request_body.to_string() != http_request_body.to_string() {
-    //     status = "HTTP/1.1 400 BAD REQUEST";
-    //     data = json!({
-    //         "error": "Request body does not match"
-    //     });
-    //     return response(&stream, data, status);
-    // }
-
-    // // Remove $.request Body from JSON
-    // let _ = &data[http_path][http_method].as_object_mut().unwrap().remove("$.request");
 
     return response(&stream, ret, status);
 }
