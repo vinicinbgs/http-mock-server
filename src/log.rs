@@ -26,9 +26,9 @@ impl HttpLog {
 
         Self::log_format({
             LogFormat {
-                handle: handle,
-                context: context,
-                now: now,
+                handle,
+                context,
+                now,
                 http_log: {
                     HttpLog {
                         ip: self.ip.to_string(),
@@ -40,31 +40,46 @@ impl HttpLog {
     }
 
     fn log_format(fields: LogFormat) {
-        let env_configs = config::get();
+        let env_log_format = config::get("LOG_FORMAT");
         let mut handle = fields.handle;
         let ip = fields.http_log.ip;
         let now = fields.now;
         let http_method_path = fields.http_log.http_method_path;
         let context = fields.context;
 
-        if env_configs["LOG_FORMAT"] == "\"csv\"" {
-            write!(
+        match env_log_format.as_str() {
+            "csv" => write!(
                 handle,
                 "{ip}, {now}, {http_method_path}, {context}\n",
                 ip = ip,
                 http_method_path = http_method_path
             )
-            .unwrap();
-        }
-
-        if env_configs["LOG_FORMAT"] == "\"ncsa\"" {
-            write!(
+            .unwrap(),
+            "ncsa" => write!(
                 handle,
                 "{ip} [{now}] {http_method_path} {context}\n",
                 ip = ip,
                 http_method_path = http_method_path
             )
-            .unwrap();
+            .unwrap(),
+            "json" => {
+                let context: serde_json::Value = serde_json::from_str(&context).unwrap_or_default();
+                let json = serde_json::json!({
+                    "ip": ip,
+                    "now": now.to_string(),
+                    "http_method_path": http_method_path,
+                    "context": context
+                });
+                let payload = serde_json::to_string(&json).unwrap();
+                write!(handle, "{}", payload.to_string()).unwrap()
+            }
+            _ => write!(
+                handle,
+                "{ip} [{now}] {http_method_path} {context}\n",
+                ip = ip,
+                http_method_path = http_method_path
+            )
+            .unwrap(),
         }
     }
 }

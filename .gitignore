@@ -1,6 +1,17 @@
+# Build folder
 /target
+.env
+
+# IDEs
 .idea
 .vscode
+
+# Logs
 package.lock
 yarn.lock
+
+# OS generated files
 node_modules
+
+# Coverage directory used by tools like istanbul
+default_*.profraw

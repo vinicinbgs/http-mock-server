@@ -6,7 +6,7 @@ mod mock_controller;
 fn main() {
     let listener = server::start();
 
-    println!("Server started on port {}", server::PORT);
+    println!("Server started on port {}", server::port());
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
