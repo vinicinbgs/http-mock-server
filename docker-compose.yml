@@ -6,8 +6,8 @@ services:
     restart: always
     ports:
       - "7878:7878"
-    networks:
-     - rust_network
+    # networks:
+    #  - rust_network
 
   # mysql:
   #   image: arm64v8/mysql
@@ -20,5 +20,5 @@ services:
   #   networks:
   #    - rust_network
 
-networks:
-  rust_network:
+# networks:
+#   rust_network:

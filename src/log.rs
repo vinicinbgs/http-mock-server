@@ -71,7 +71,7 @@ impl HttpLog {
                     "context": context
                 });
                 let payload = serde_json::to_string(&json).unwrap();
-                write!(handle, "{}", payload.to_string()).unwrap()
+                write!(handle, "{}\n", payload.to_string()).unwrap()
             }
             _ => write!(
                 handle,

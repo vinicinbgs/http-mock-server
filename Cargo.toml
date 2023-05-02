@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4.22"
-mysql = "22.2.0"
+# mysql = "22.2.0"
 serde = "1.0.144"
 serde_json = "1.0.85"
 regex = "1"

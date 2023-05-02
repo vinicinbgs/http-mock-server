@@ -1,11 +1,15 @@
-FROM rust:1.69 as builder
-
-RUN mkdir /usr/src/app
-
-WORKDIR /usr/src/app
-
+# Build image
+FROM rust:1.69-alpine3.17 as builder
+WORKDIR /usr/src/http_mock_server
 COPY . .
+RUN echo $(nproc)
+RUN cargo install -j=$(nproc) --path .
 
-RUN cargo build --release
-
-CMD [ "./target/release/rust_project" ]
+# Production image
+FROM alpine:3.17
+RUN apk update
+WORKDIR /usr/local/bin/
+COPY --from=builder  /usr/src/http_mock_server/.env.example .env
+COPY --from=builder  /usr/src/http_mock_server/mock_data.json mock_data.json
+COPY --from=builder /usr/local/cargo/bin/http_mock_server /usr/local/bin/http_mock_server
+CMD ["http_mock_server"]

@@ -78,7 +78,11 @@ pub fn request(mut stream: &TcpStream) -> HttpFields {
 fn url(http_method_path: &str) -> String {
     let splitted: Vec<&str> = http_method_path.split(" ").collect();
 
-    return String::from(splitted[1]);
+    if splitted.len() > 1 {
+        return String::from(splitted[1]);
+    } else {
+        return String::from("");
+    }
 }
 
 fn method(http_method_path: &str) -> String {
