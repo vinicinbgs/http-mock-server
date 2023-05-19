@@ -15,7 +15,10 @@ fn main() {
 
         let http_fields = server::request(&stream);
 
-        if http_fields.original_url == "/healthcheck" {
+        if http_fields.original_url == "/healthcheck"
+            || http_fields.original_url == "/"
+            || http_fields.original_url == "/favicon.ico"
+        {
             let content: String = String::from("{\"status\": \"Ok\"}");
             let length = format!("Content-Length: {}", content.len());
             stream

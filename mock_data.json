@@ -1,9 +1,6 @@
 {
   "/register": {
-    "POST": {
-      "$.request": {
-        "name": "John"
-      },
+    "GET": {
       "$.response": {
         "$.body": {
           "name": "John Doe",

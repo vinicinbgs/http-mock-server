@@ -17,19 +17,23 @@ impl DataFile for File {
     fn get_path(&self) -> String {
         let args: Vec<String> = env::args().collect();
 
-        let default = String::from(self.file_path.to_string());
+        let file = String::from(if self.file_path != "" {
+            self.file_path.to_string()
+        } else {
+            "mock_data.json".to_string()
+        });
 
         let mut i = 0;
 
         let file_path = loop {
-            let arg = args.get(i).unwrap_or(&default);
+            let arg = args.get(i).unwrap_or(&file);
 
             if arg.len() > 2 && &arg[..3] == "-f=" {
                 break arg[3..].to_string();
             }
 
-            if arg == &default {
-                break default.to_string();
+            if arg == &file {
+                break file.to_string();
             }
 
             i += 1;
@@ -174,7 +178,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn test_exception_when_not_pass_file_path() {
+    fn test_exception_when_input_wrong_file_path() {
         execute(
             Http {
                 path: "/register",
@@ -182,8 +186,24 @@ mod tests {
                 request_body: "".to_string(),
             },
             File {
-                file_path: "".to_string(),
+                file_path: "file_that_not_exist.json".to_string(),
             },
         );
+    }
+
+    #[test]
+    fn test_read_from_default_file_and_return_mock_request_body_match() {
+        let ret = execute(
+            Http {
+                path: "/register",
+                method: "POST",
+                request_body: "".to_string(),
+            },
+            File {
+                file_path: "./src/services/test_mock_data.json".to_string(),
+            },
+        );
+
+        assert_eq!(ret["$.body"]["name"], "John Doe");
     }
 }
