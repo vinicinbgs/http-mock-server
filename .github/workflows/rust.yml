@@ -19,6 +19,3 @@ jobs:
 
     - name: Run tests
       run: cargo test --verbose
-      
-    - name: Build
-      run: cargo build --verbose

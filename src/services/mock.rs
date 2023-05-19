@@ -17,18 +17,14 @@ impl DataFile for File {
     fn get_path(&self) -> String {
         let args: Vec<String> = env::args().collect();
 
-        let default = String::from(if self.file_path != "" {
-            self.file_path.to_string()
-        } else {
-            "./mock_data.json".to_string()
-        });
+        let default = String::from(self.file_path.to_string());
 
         let mut i = 0;
 
         let file_path = loop {
             let arg = args.get(i).unwrap_or(&default);
 
-            if &arg[..3] == "-f=" {
+            if arg.len() > 2 && &arg[..3] == "-f=" {
                 break arg[3..].to_string();
             }
 
@@ -177,8 +173,9 @@ mod tests {
     }
 
     #[test]
-    fn test_read_from_default_file_and_return_mock_request_body_match() {
-        let ret = execute(
+    #[should_panic]
+    fn test_exception_when_not_pass_file_path() {
+        execute(
             Http {
                 path: "/register",
                 method: "POST",
@@ -188,7 +185,5 @@ mod tests {
                 file_path: "".to_string(),
             },
         );
-
-        assert_eq!(ret["$.body"]["name"], "John Doe");
     }
 }
