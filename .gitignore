@@ -9,6 +9,7 @@
 # Logs
 package.lock
 yarn.lock
+.DS_Store
 
 # OS generated files
 node_modules

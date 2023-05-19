@@ -1,0 +1,3 @@
+steps:
+  - name: cargo
+    args: ['test', '--verbose']
