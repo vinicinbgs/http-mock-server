@@ -14,5 +14,12 @@
         }
       }
     }
+  },
+  "/video": {
+    "GET": {
+      "$.response": {
+        "$.file": "./src/vid.mp4"
+      }
+    }
   }
 }
