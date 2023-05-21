@@ -68,6 +68,13 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
 
     let data_request_body = data[http.path][http.method]["$.request"].to_owned();
 
+    if http.path == "/list" {
+        return TypeOr::Right(json!({
+            "$.body": data,
+            "$.status": "200",
+        }));
+    }
+
     if data[http.path][http.method] == Null {
         return TypeOr::Right(json!({
             "$.body": {

@@ -6,15 +6,14 @@
 <body>
     <video id="videoPlayer" controls autoplay></video>
 
+    <img id="imagePlayer" src="http://localhost:7878/photo"/>
+
     <script>
         // Get a reference to the video element
         const video = document.getElementById('videoPlayer');
 
         // Set the source URL of the video
         video.src = 'http://localhost:7878/video';
-
-        // Play the video
-        video.play();
     </script>
 </body>
 </html>
