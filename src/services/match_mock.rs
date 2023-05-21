@@ -265,6 +265,48 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn test_list_all_enable_mock_routes() {
+        let ret = execute(
+            Http {
+                path: "/list",
+                method: "GET",
+                request_body: "".to_string(),
+            },
+            MockFile {
+                file_path: "./src/services/test_mock_data.json".to_string(),
+            },
+        );
+
+        match ret {
+            TypeOr::Left(_) => panic!("Should not return binary data"),
+            TypeOr::Right(ret) => {
+                assert_eq!(
+                    ret["$.body"],
+                    json!({
+                      "/register": {
+                        "POST": {
+                          "$.response": {
+                            "$.status": 201,
+                            "$.body": {
+                              "name": "John Doe",
+                              "age": 30,
+                              "address": {
+                                "street": "123 Main St",
+                                "city": "Anytown",
+                                "state": "CA",
+                                "zip": "12345"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    })
+                );
+            }
+        }
+    }
 }
 
 // todo: rename file to match_mock

@@ -6,9 +6,9 @@ use std::{io::Write, net::TcpStream};
 #[path = "./macros/response_status.rs"]
 mod response_status;
 
-#[path = "../services/mock.rs"]
-mod mock_service;
-use mock_service::{Http, MockFile, TypeOr};
+#[path = "../services/match_mock.rs"]
+mod match_mock;
+use match_mock::{Http, MockFile, TypeOr};
 
 pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     let http_path = http_fields.original_url.as_str();
@@ -20,7 +20,7 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     // let path_formatted = re.replace_all(path, "/register/:id");
     //println!("{:#}", re.is_match(Some(data).unwrap().to_string().as_str()));
 
-    let ret = mock_service::execute(
+    let ret = match_mock::execute(
         Http {
             path: http_path,
             method: http_method,
