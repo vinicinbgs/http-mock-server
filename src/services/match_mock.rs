@@ -1,10 +1,11 @@
+//use regex::Regex;
 use serde_json::{
     json,
     Value::{self, Null},
 };
 
 use std::{
-    env,
+    collections::HashMap,
     fs::{self, File},
     io::Read,
 };
@@ -51,6 +52,8 @@ pub struct Http<'a> {
     pub path: &'a str,
     pub method: &'a str,
     pub request_body: String,
+    pub query_params: HashMap<String, String>,
+    pub headers: HashMap<String, String>,
 }
 
 pub enum TypeOr<S, T> {
@@ -66,7 +69,9 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
 
     let mut data: Value = serde_json::from_str(&file_string).expect("Unable to parse");
 
-    let data_request_body = data[http.path][http.method]["$.request"].to_owned();
+    let path = http.path.split("?").collect::<Vec<&str>>()[0];
+
+    let data_request_body = data[path][http.method]["$.request"].to_owned();
 
     if http.path == "/list" {
         return TypeOr::Right(json!({
@@ -75,7 +80,7 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
         }));
     }
 
-    if data[http.path][http.method] == Null {
+    if data[path][http.method] == Null {
         return TypeOr::Right(json!({
             "$.body": {
                 "error": "URI Path or HTTP Method Not found",
@@ -103,13 +108,13 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
         }));
     }
 
-    let _ = &data[http.path][http.method]
+    let _ = &data[path][http.method]
         .as_object_mut()
         .unwrap()
         .remove("$.request");
 
-    if data[http.path][http.method]["$.response"]["$.file"] != Null {
-        let filename = data[http.path][http.method]["$.response"]["$.file"]
+    if data[path][http.method]["$.response"]["$.file"] != Null {
+        let filename = data[path][http.method]["$.response"]["$.file"]
             .as_str()
             .unwrap();
 
@@ -119,12 +124,25 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
         };
 
         let mut buffer = Vec::new();
+
+        // if http.headers.contains_key("Range") {
+        //     let range = http.headers.get("Range").unwrap();
+        //     let bytes_regex = Regex::new(r"^bytes=(\d+)-(\d+)?$").unwrap();
+        //     let range = bytes_regex.captures(range.as_str()).unwrap();
+        //     let mut start_byte = range[1].parse::<usize>().unwrap();
+
+        //     start_byte = if start_byte > 0 { start_byte } else { 100000 };
+        //     dbg!(start_byte);
+        //     f.read(&mut buffer).unwrap();
+        //     return TypeOr::Left(buffer.to_vec());
+        // }
+
         f.read_to_end(&mut buffer).unwrap();
 
-        return TypeOr::Left(buffer);
+        return TypeOr::Left(buffer.to_vec());
     }
 
-    return TypeOr::Right(data[http.path][http.method]["$.response"].to_owned());
+    return TypeOr::Right(data[path][http.method]["$.response"].to_owned());
 }
 
 fn check_http_request_body_is_different_from_data_request_body(

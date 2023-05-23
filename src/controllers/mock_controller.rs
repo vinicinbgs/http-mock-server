@@ -12,6 +12,7 @@ use match_mock::{Http, MockFile, TypeOr};
 
 pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     let http_path = http_fields.original_url.as_str();
+    let query_params = http_fields.query_params;
     let http_method = http_fields.method.as_str();
 
     // todo: Improve using dynamic route params
@@ -25,6 +26,8 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
             path: http_path,
             method: http_method,
             request_body: http_fields.body,
+            query_params,
+            headers: http_fields.headers,
         },
         MockFile {
             file_path: String::new(),
@@ -45,13 +48,14 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     }
 }
 
-fn response_format(_status: String, _length: String, _content_type: String) -> String {
-    let content_type: &str =
-        "Content-Type: {_content_type}\r\nAccess-Control-Allow-Origin: *\r\nAccept-Ranges: bytes";
+fn response_format(status: String, length: String, content_type: String) -> String {
+    let content_header = format!(
+        "Content-Type: {content_type}\r\nAccess-Control-Allow-Origin: *\r\nAccept-Ranges: bytes"
+    );
 
-    let status = status!(_status.as_str());
+    let status = status!(status.as_str());
 
-    return format!("{status}\r\n{_length}\r\n{content_type}\r\n\r\n");
+    return format!("{status}\r\n{length}\r\n{content_header}\r\n\r\n");
 }
 
 fn stream_response(mut stream: &TcpStream, data: Vec<u8>, status: String) {
@@ -60,7 +64,7 @@ fn stream_response(mut stream: &TcpStream, data: Vec<u8>, status: String) {
 
     stream.write_all(response.as_bytes()).unwrap();
 
-    stream.write_all(&data).unwrap();
+    stream.write_all(&data).unwrap_or_default();
 
     stream.flush().unwrap();
 }
@@ -72,7 +76,7 @@ fn response(mut stream: &TcpStream, data: Value, status: String) {
 
     stream.write_all(response.as_bytes()).unwrap();
 
-    stream.write(content.to_string().as_bytes()).unwrap();
+    stream.write(content.as_bytes()).unwrap_or_default();
 
     stream.flush().unwrap();
 }
