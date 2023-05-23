@@ -6,6 +6,7 @@ use serde_json::{
 
 use std::{
     collections::HashMap,
+    env,
     fs::{self, File},
     io::Read,
 };
@@ -171,6 +172,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "src/services/test_mock_data.json".to_string(),
@@ -192,6 +195,8 @@ mod tests {
                 path: "/register",
                 method: "GET",
                 request_body: "".to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "src/services/test_mock_data.json".to_string(),
@@ -213,6 +218,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: r#"{"name": "what_your_name"}"#.to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "src/services/test_mock_data.json".to_string(),
@@ -234,6 +241,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "-f=src/services/test_mock_data.json".to_string(),
@@ -256,6 +265,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "file_that_not_exist.json".to_string(),
@@ -270,6 +281,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "./src/services/test_mock_data.json".to_string(),
@@ -291,6 +304,8 @@ mod tests {
                 path: "/list",
                 method: "GET",
                 request_body: "".to_string(),
+                query_params: todo!(),
+                headers: todo!(),
             },
             MockFile {
                 file_path: "./src/services/test_mock_data.json".to_string(),

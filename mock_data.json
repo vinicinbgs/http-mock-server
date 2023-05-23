@@ -21,12 +21,5 @@
         "$.file": "./src/vid.mp4"
       }
     }
-  },
-  "/photo": {
-    "GET": {
-      "$.response": {
-        "$.file": "./src/photo.jpg"
-      }
-    }
   }
 }
