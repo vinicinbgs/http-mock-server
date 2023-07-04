@@ -35,7 +35,9 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
     );
 
     return match ret {
-        TypeOr::Buffer(ret) => stream_response(&stream, ret, String::from("200")),
+        TypeOr::Buffer(ret, content_type) => {
+            stream_response(&stream, ret, String::from("200"), content_type.to_string())
+        }
         TypeOr::Json(ret) => response(
             &stream,
             ret["$.body"].to_owned(),
@@ -54,9 +56,9 @@ fn response_format(status: String, length: String, content_type: String) -> Stri
     return format!("{status}\r\n{length}\r\n{content_header}\r\n\r\n");
 }
 
-fn stream_response(mut stream: &TcpStream, data: Vec<u8>, status: String) {
+fn stream_response(mut stream: &TcpStream, data: Vec<u8>, status: String, content_type: String) {
     let length = format!("Content-Length: {}", data.len());
-    let response = response_format(status, length, "video/mp4".to_string());
+    let response = response_format(status, length, content_type.to_string());
 
     stream.write_all(response.as_bytes()).unwrap();
 

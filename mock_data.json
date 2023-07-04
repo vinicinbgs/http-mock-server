@@ -23,7 +23,16 @@
   "/video": {
     "GET": {
       "$.response": {
-        "$.file": "./src/BigBuckBunny.mp4"
+        "$.content-type": "video/mp4",
+        "$.file": "./src/vid.mp4"
+      }
+    }
+  },
+  "/image": {
+    "GET": {
+      "$.response": {
+        "$.content-type": "image/webp",
+        "$.file": "https://mpost.io/wp-content/uploads/image-74-7.jpg"
       }
     }
   }

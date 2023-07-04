@@ -58,7 +58,7 @@ pub struct Http<'a> {
 
 #[derive(Debug)]
 pub enum TypeOr<B, J> {
-    Buffer(B),
+    Buffer(B, J),
     Json(J),
 }
 
@@ -123,28 +123,26 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
             .as_str()
             .unwrap();
 
+        if filename.starts_with("http") || filename.starts_with("data:") {
+            return TypeOr::Buffer(
+                filename.as_bytes().to_vec(),
+                data[path][http.method]["$.response"]["$.content-type"].take(),
+            );
+        }
+
+        let mut buffer = Vec::new();
+
         let mut f = match File::open(&filename) {
             Ok(file) => file,
             Err(_) => panic!("Unable to open asset file {}", filename),
         };
 
-        let mut buffer = Vec::new();
-
-        // if http.headers.contains_key("Range") {
-        //     let range = http.headers.get("Range").unwrap();
-        //     let bytes_regex = Regex::new(r"^bytes=(\d+)-(\d+)?$").unwrap();
-        //     let range = bytes_regex.captures(range.as_str()).unwrap();
-        //     let mut start_byte = range[1].parse::<usize>().unwrap();
-
-        //     start_byte = if start_byte > 0 { start_byte } else { 100000 };
-        //     dbg!(start_byte);
-        //     f.read(&mut buffer).unwrap();
-        //     return TypeOr::Left(buffer.to_vec());
-        // }
-
         f.read_to_end(&mut buffer).unwrap();
 
-        return TypeOr::Buffer(buffer.to_vec());
+        return TypeOr::Buffer(
+            buffer.to_vec(),
+            data[path][http.method]["$.response"]["$.content-type"].take(),
+        );
     }
 
     return TypeOr::Json(data[path][http.method]["$.response"].to_owned());
@@ -185,7 +183,7 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Buffer(_, _) => panic!("Should not return binary data"),
             TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["name"], "John Doe");
             }
@@ -208,7 +206,7 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Buffer(_, _) => panic!("Should not return binary data"),
             TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["error"], "URI Path or HTTP Method Not found");
             }
@@ -231,7 +229,7 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Buffer(_, _) => panic!("Should not return binary data"),
             TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["error"], "Request body does not match");
             }
@@ -254,7 +252,7 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Buffer(_, _) => panic!("Should not return binary data"),
             TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["name"], "John Doe");
             }
@@ -294,7 +292,7 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Buffer(_, _) => panic!("Should not return binary data"),
             TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["name"], "John Doe");
             }
@@ -317,7 +315,7 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Buffer(_, _) => panic!("Should not return binary data"),
             TypeOr::Json(ret) => {
                 assert_eq!(
                     ret["$.body"],
