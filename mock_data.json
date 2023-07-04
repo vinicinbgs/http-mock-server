@@ -1,6 +1,11 @@
 {
   "/register": {
-    "GET": {
+    "POST": {
+      "$.request": {
+        "$.body": {
+          "name": "John Doe"
+        }
+      },
       "$.response": {
         "$.body": {
           "name": "John Doe",
@@ -12,6 +17,22 @@
             "zip": "12345"
           }
         }
+      }
+    }
+  },
+  "/video": {
+    "GET": {
+      "$.response": {
+        "$.content-type": "video/mp4",
+        "$.file": "./src/vid.mp4"
+      }
+    }
+  },
+  "/image": {
+    "GET": {
+      "$.response": {
+        "$.content-type": "image/webp",
+        "$.file": "https://mpost.io/wp-content/uploads/image-74-7.jpg"
       }
     }
   }
