@@ -1,4 +1,3 @@
-use regex::Regex;
 use std::{
     collections::HashMap,
     io::Read,
@@ -67,21 +66,18 @@ pub fn request(mut stream: &TcpStream) -> HttpFields {
         http_headers.insert(header_split[0].to_string(), header_split[1].to_string());
     }
 
-    let re = Regex::new(r"\n\s*|\s").unwrap(); // remove all spaces and new lines
-    let http_request_body = re.replace_all(&body, "").to_string();
-
     let access_log = HttpLog {
         ip: stream.peer_addr().unwrap().to_string(),
         http_method_path: http_method_path.to_string(),
     };
 
-    access_log.emit(&http_request_body);
+    access_log.emit(&body.to_string());
 
     let original_url = url(http_method_path);
     let query_params = query_params(original_url.clone().as_str());
 
     return HttpFields {
-        body: http_request_body,
+        body: body.to_string(),
         original_url,
         method: method(http_method_path),
         headers: http_headers,

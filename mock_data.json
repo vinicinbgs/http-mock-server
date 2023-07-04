@@ -1,6 +1,11 @@
 {
   "/register": {
-    "GET": {
+    "POST": {
+      "$.request": {
+        "$.body": {
+          "name": "John Doe"
+        }
+      },
       "$.response": {
         "$.body": {
           "name": "John Doe",
@@ -18,7 +23,7 @@
   "/video": {
     "GET": {
       "$.response": {
-        "$.file": "./src/vid.mp4"
+        "$.file": "./src/BigBuckBunny.mp4"
       }
     }
   }

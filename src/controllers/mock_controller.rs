@@ -34,18 +34,14 @@ pub fn mock(stream: TcpStream, http_fields: HttpFields) {
         },
     );
 
-    match ret {
-        TypeOr::Left(ret) => {
-            return stream_response(&stream, ret, String::from("200"));
-        }
-        TypeOr::Right(ret) => {
-            return response(
-                &stream,
-                ret["$.body"].to_owned(),
-                ret["$.status"].to_string(),
-            );
-        }
-    }
+    return match ret {
+        TypeOr::Buffer(ret) => stream_response(&stream, ret, String::from("200")),
+        TypeOr::Json(ret) => response(
+            &stream,
+            ret["$.body"].to_owned(),
+            ret["$.status"].to_string(),
+        ),
+    };
 }
 
 fn response_format(status: String, length: String, content_type: String) -> String {

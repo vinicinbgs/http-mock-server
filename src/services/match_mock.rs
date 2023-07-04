@@ -1,4 +1,3 @@
-//use regex::Regex;
 use serde_json::{
     json,
     Value::{self, Null},
@@ -57,9 +56,10 @@ pub struct Http<'a> {
     pub headers: HashMap<String, String>,
 }
 
-pub enum TypeOr<S, T> {
-    Left(S),
-    Right(T),
+#[derive(Debug)]
+pub enum TypeOr<B, J> {
+    Buffer(B),
+    Json(J),
 }
 
 pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
@@ -70,19 +70,24 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
 
     let mut data: Value = serde_json::from_str(&file_string).expect("Unable to parse");
 
+    let http_request_body: Value = match http.request_body != "" {
+        true => serde_json::from_str(&http.request_body).expect("Unable to parse"),
+        false => Null,
+    };
+
     let path = http.path.split("?").collect::<Vec<&str>>()[0];
 
-    let data_request_body = data[path][http.method]["$.request"].to_owned();
+    let file_data_request_body = data[path][http.method]["$.request"]["$.body"].to_owned();
 
-    if http.path == "/list" {
-        return TypeOr::Right(json!({
+    if http.path == "/_cat/routes" {
+        return TypeOr::Json(json!({
             "$.body": data,
             "$.status": "200",
         }));
     }
 
     if data[path][http.method] == Null {
-        return TypeOr::Right(json!({
+        return TypeOr::Json(json!({
             "$.body": {
                 "error": "URI Path or HTTP Method Not found",
                 "path": http.path,
@@ -93,17 +98,16 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
     }
 
     if check_http_request_body_is_different_from_data_request_body(
-        data_request_body.to_string(),
-        http.request_body.to_string(),
-    ) || check_data_request_body_is_null_and_http_request_body_is_not_empty(
-        data_request_body.to_string(),
-        http.request_body.to_string(),
+        file_data_request_body.to_string(),
+        http_request_body.to_string(),
+    ) || check_data_request_body_is_null_and_http_request_body_is_not_null(
+        file_data_request_body.to_string(),
+        http_request_body.to_string(),
     ) {
-        let request: Value = serde_json::from_str(&http.request_body).unwrap_or_default();
-        return TypeOr::Right(json!({
+        return TypeOr::Json(json!({
             "$.body": {
                 "error": "Request body does not match",
-                "request": request,
+                "request": http_request_body,
             },
             "$.status": "400",
         }));
@@ -140,24 +144,24 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
 
         f.read_to_end(&mut buffer).unwrap();
 
-        return TypeOr::Left(buffer.to_vec());
+        return TypeOr::Buffer(buffer.to_vec());
     }
 
-    return TypeOr::Right(data[path][http.method]["$.response"].to_owned());
+    return TypeOr::Json(data[path][http.method]["$.response"].to_owned());
 }
 
 fn check_http_request_body_is_different_from_data_request_body(
-    data_request_body: String,
+    file_data_request_body: String,
     http_request_body: String,
 ) -> bool {
-    return data_request_body != http_request_body && data_request_body != "null";
+    return file_data_request_body != http_request_body && file_data_request_body != "null";
 }
 
-fn check_data_request_body_is_null_and_http_request_body_is_not_empty(
-    data_request_body: String,
+fn check_data_request_body_is_null_and_http_request_body_is_not_null(
+    file_data_request_body: String,
     http_request_body: String,
 ) -> bool {
-    return data_request_body == "null" && http_request_body != "";
+    return file_data_request_body == "null" && http_request_body != "null";
 }
 
 #[cfg(test)]
@@ -172,8 +176,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "src/services/test_mock_data.json".to_string(),
@@ -181,8 +185,8 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Left(_) => panic!("Should not return binary data"),
-            TypeOr::Right(ret) => {
+            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["name"], "John Doe");
             }
         }
@@ -195,8 +199,8 @@ mod tests {
                 path: "/register",
                 method: "GET",
                 request_body: "".to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "src/services/test_mock_data.json".to_string(),
@@ -204,8 +208,8 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Left(_) => panic!("Should not return binary data"),
-            TypeOr::Right(ret) => {
+            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["error"], "URI Path or HTTP Method Not found");
             }
         }
@@ -218,8 +222,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: r#"{"name": "what_your_name"}"#.to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "src/services/test_mock_data.json".to_string(),
@@ -227,8 +231,8 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Left(_) => panic!("Should not return binary data"),
-            TypeOr::Right(ret) => {
+            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["error"], "Request body does not match");
             }
         }
@@ -241,8 +245,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "-f=src/services/test_mock_data.json".to_string(),
@@ -250,8 +254,8 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Left(_) => panic!("Should not return binary data"),
-            TypeOr::Right(ret) => {
+            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["name"], "John Doe");
             }
         }
@@ -265,8 +269,8 @@ mod tests {
                 path: "/register",
                 method: "POST",
                 request_body: "".to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "file_that_not_exist.json".to_string(),
@@ -280,9 +284,9 @@ mod tests {
             Http {
                 path: "/register",
                 method: "POST",
-                request_body: "".to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                request_body: Null.to_string(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "./src/services/test_mock_data.json".to_string(),
@@ -290,22 +294,22 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Left(_) => panic!("Should not return binary data"),
-            TypeOr::Right(ret) => {
+            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Json(ret) => {
                 assert_eq!(ret["$.body"]["name"], "John Doe");
             }
         }
     }
 
     #[test]
-    fn test_list_all_enable_mock_routes() {
+    fn test_list_all_mock_routes() {
         let ret = execute(
             Http {
-                path: "/list",
+                path: "/_cat/routes",
                 method: "GET",
                 request_body: "".to_string(),
-                query_params: todo!(),
-                headers: todo!(),
+                query_params: HashMap::new(),
+                headers: HashMap::new(),
             },
             MockFile {
                 file_path: "./src/services/test_mock_data.json".to_string(),
@@ -313,8 +317,8 @@ mod tests {
         );
 
         match ret {
-            TypeOr::Left(_) => panic!("Should not return binary data"),
-            TypeOr::Right(ret) => {
+            TypeOr::Buffer(_) => panic!("Should not return binary data"),
+            TypeOr::Json(ret) => {
                 assert_eq!(
                     ret["$.body"],
                     json!({
@@ -341,5 +345,3 @@ mod tests {
         }
     }
 }
-
-// todo: rename file to match_mock
