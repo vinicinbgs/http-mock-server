@@ -24,7 +24,7 @@
     "GET": {
       "$.response": {
         "$.content-type": "video/mp4",
-        "$.file": "./src/vid.mp4"
+        "$.file": "./src/sample.mp4"
       }
     }
   },

@@ -22,4 +22,4 @@ cloud-builders-community
 
 # Asset Files
 /src/*.mp4
-!/src/vid.mp4
+!/src/sample.mp4
