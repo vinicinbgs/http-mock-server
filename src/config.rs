@@ -1,7 +1,12 @@
 use std::{collections::HashMap, fs};
 
 fn all() -> HashMap<String, String> {
-    let configs = fs::read_to_string(".env").unwrap();
+    let configs = match fs::read_to_string(".env") {
+        Ok(file) => file,
+        Err(_) => {
+            panic!("<< File .env not found >>");
+        }
+    };
 
     let parse: Vec<&str> = configs.split("\n").collect();
 
