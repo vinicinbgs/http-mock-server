@@ -9,10 +9,10 @@ RUN cargo install -j=$(nproc) --path .
 FROM alpine:3.17
 RUN apk update
 WORKDIR /usr/local/bin/
-COPY --from=builder  /usr/src/http_mock_server/.env.example .env
-COPY --from=builder  /usr/src/http_mock_server/mock_data.json mock_data.json
-COPY --from=builder /usr/local/cargo/bin/http_mock_server http_mock_server
-COPY --from=builder /usr/src/sample.mp4 sample.mp4
+COPY --from=builder     /usr/src/http_mock_server/.env.example      .env
+COPY --from=builder     /usr/src/http_mock_server/mock_data.json    mock_data.json
+COPY --from=builder     /usr/src/http_mock_server/src/sample.mp4        sample.mp4
+COPY --from=builder     /usr/local/cargo/bin/http_mock_server       http_mock_server
 
 EXPOSE 7878
 
