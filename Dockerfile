@@ -11,5 +11,9 @@ RUN apk update
 WORKDIR /usr/local/bin/
 COPY --from=builder  /usr/src/http_mock_server/.env.example .env
 COPY --from=builder  /usr/src/http_mock_server/mock_data.json mock_data.json
-COPY --from=builder /usr/local/cargo/bin/http_mock_server /usr/local/bin/http_mock_server
+COPY --from=builder /usr/local/cargo/bin/http_mock_server http_mock_server
+COPY --from=builder /usr/src/sample.mp4 sample.mp4
+
+EXPOSE 7878
+
 CMD ["http_mock_server", "-f", "./mock_data.json"]

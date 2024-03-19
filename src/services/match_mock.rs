@@ -8,6 +8,7 @@ use std::{
     env,
     fs::{self, File},
     io::Read,
+    io::Write,
 };
 
 trait DataFile {
@@ -124,6 +125,7 @@ pub fn execute(http: Http, file: MockFile) -> TypeOr<Vec<u8>, Value> {
             .unwrap();
 
         if filename.starts_with("http") || filename.starts_with("data:") {
+            write!(std::io::stdout(), "Downloading file from {}\n", filename).unwrap();
             return TypeOr::Buffer(
                 filename.as_bytes().to_vec(),
                 data[path][http.method]["$.response"]["$.content-type"].take(),
